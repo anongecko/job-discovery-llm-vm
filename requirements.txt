@@ -1,0 +1,18 @@
+# API and web
+fastapi==0.103.1
+uvicorn==0.23.2
+pydantic==2.3.0
+python-multipart==0.0.6
+
+# ML and AI
+torch==2.1.0
+transformers==4.34.0
+sentence-transformers==2.2.2
+accelerate==0.23.0
+bitsandbytes==0.41.1
+optimum==1.13.1
+
+# Utilities
+psutil==5.9.5
+tenacity==8.2.3
+python-dotenv==1.0.0

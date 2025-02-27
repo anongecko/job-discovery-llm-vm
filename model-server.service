@@ -1,0 +1,16 @@
+[Unit]
+Description=AI Model Server for Job Discovery
+After=network.target
+
+[Service]
+User=ai-service
+Group=ai-service
+WorkingDirectory=/opt/model-server
+ExecStart=/usr/bin/python3 -m model_server.main
+Restart=on-failure
+RestartSec=5
+Environment=PYTHONPATH=${PYTHONPATH}:/opt/model-server
+Environment=CONFIG_FILE=/opt/model-server/model_config.json
+
+[Install]
+WantedBy=multi-user.target

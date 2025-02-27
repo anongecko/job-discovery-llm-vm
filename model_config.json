@@ -1,0 +1,25 @@
+{
+  "primary_model": {
+    "model_name": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "model_path": "models/mixtral",
+    "device": "cuda",
+    "quantization": "4bit",
+    "max_tokens": 1024,
+    "max_batch_size": 4,
+    "download_if_missing": true
+  },
+  "embedding_model": {
+    "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+    "model_path": "models/all-MiniLM-L6-v2",
+    "device": "cuda",
+    "download_if_missing": true
+  },
+  "classifier_model": {
+    "model_name": "google/gemma-2b-it",
+    "model_path": "models/gemma-2b",
+    "device": "cuda",
+    "quantization": "4bit",
+    "max_tokens": 256,
+    "download_if_missing": true
+  }
+}

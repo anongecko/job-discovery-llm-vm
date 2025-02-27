@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  model-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/app/models
+      - ./api_keys.json:/app/api_keys.json
+      - ./model_config.json:/app/model_config.json
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
