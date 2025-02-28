@@ -1,10 +1,11 @@
-version: '3'
+version: '3.8'
 
 services:
   model-server:
     build:
       context: .
       dockerfile: Dockerfile
+    image: job-discovery-model-server:latest
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -13,7 +14,17 @@ services:
       - ./api_keys.json:/app/api_keys.json
       - ./model_config.json:/app/model_config.json
     environment:
+      - CONFIG_FILE=/app/model_config.json
+      - PYTHONUNBUFFERED=1
+      - WORKERS=8
       - CUDA_VISIBLE_DEVICES=0
+      - PORT=8080
+      - HOST=0.0.0.0
+      - TIMEOUT=600
+      - MAX_REQUEST_SIZE=20MB
+    ulimits:
+      memlock: -1
+    shm_size: 16gb
     deploy:
       resources:
         reservations:
@@ -21,3 +32,53 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # Optional monitoring service
+  prometheus:
+    image: prom/prometheus:v2.43.0
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    depends_on:
+      - model-server
+
+  # Optional visualization for monitoring
+  grafana:
+    image: grafana/grafana:9.5.2
+    container_name: grafana
+    restart: unless-stopped
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=model-server-admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus_data:
+  grafana_data:

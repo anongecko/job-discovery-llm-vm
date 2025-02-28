@@ -1,8 +1,15 @@
 # API and web
 fastapi==0.103.1
 uvicorn==0.23.2
+# API and web
+fastapi==0.103.1
+uvicorn==0.23.2
 pydantic==2.3.0
 python-multipart==0.0.6
+httpx==0.25.0
+starlette==0.27.0
+websockets==11.0.3
+sse-starlette==1.6.5
 
 # ML and AI
 torch==2.1.0
@@ -11,8 +18,35 @@ sentence-transformers==2.2.2
 accelerate==0.23.0
 bitsandbytes==0.41.1
 optimum==1.13.1
+llama-cpp-python==0.2.11
+nomic==2.0.8
+tokenizers==0.14.1
+
+# For download and file management
+aiofiles==23.2.1
+tqdm==4.66.1
+requests==2.31.0
+huggingface_hub==0.17.3
+
+# Security and APIs
+python-jose==3.3.0
+cryptography==41.0.3
+passlib==1.7.4
+
+# Monitoring and metrics
+prometheus-client==0.17.1
+prometheus-fastapi-instrumentator==6.1.0
 
 # Utilities
 psutil==5.9.5
 tenacity==8.2.3
 python-dotenv==1.0.0
+numpy==1.24.4
+pandas==2.1.1
+ujson==5.8.0
+aiocache==0.12.1
+cachetools==5.3.1
+
+# Async utilities
+asyncio==3.4.3
+backoff==2.2.1
