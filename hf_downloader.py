@@ -665,6 +665,10 @@ async def main():
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     parser.add_argument("--model", type=str, help="Download only a specific model (primary, embedding, classifier)")
 
+    # Add direct URL download support
+    parser.add_argument("--url", type=str, help="Direct URL to download")
+    parser.add_argument("--output", type=str, help="Output filename for direct URL download (used with --url)")
+
     args = parser.parse_args()
 
     # Set up logging level
@@ -675,12 +679,7 @@ async def main():
     if not args.skip_optimizations:
         await optimize_system()
 
-    # Check if config file exists
-    if not os.path.exists(args.config):
-        logger.error(f"Config file not found: {args.config}")
-        sys.exit(1)
-
-    # Create download manager
+    # Create download manager with common settings
     downloader = DownloadManager(
         output_dir=args.output_dir,
         parallel_downloads=args.parallel_downloads,
@@ -690,6 +689,38 @@ async def main():
         azure_region=args.azure_region,
         tcp_optimization=not args.skip_optimizations,
     )
+
+    # Handle direct URL download if specified
+    if args.url:
+        # Get output filename
+        if args.output:
+            output_file = args.output
+        else:
+            # Extract filename from URL
+            parsed_url = urlparse(args.url)
+            output_file = os.path.basename(unquote(parsed_url.path))
+            if not output_file:
+                output_file = "downloaded_file"  # Fallback name
+
+        # Create output path
+        output_path = Path(args.output_dir) / output_file
+
+        logger.info(f"Starting direct URL download: {args.url} -> {output_path}")
+
+        # Download the file
+        success = await downloader.download_from_url(args.url, output_path)
+
+        if success:
+            logger.info(f"Successfully downloaded: {output_path}")
+            sys.exit(0)
+        else:
+            logger.error(f"Failed to download: {args.url}")
+            sys.exit(1)
+
+    # Check if config file exists for regular downloads
+    if not os.path.exists(args.config):
+        logger.error(f"Config file not found: {args.config}")
+        sys.exit(1)
 
     # Optional: filter for specific model
     if args.model:
